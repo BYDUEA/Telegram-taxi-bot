@@ -1,0 +1,66 @@
+import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+
+# ✅ Siz yuborgan token va IDlar:
+BOT_TOKEN = "8067132525:AAEt-UELXYTK0fKRA99jFBeX2GxddxEV_TI"
+ADMIN_ID = 8053258736
+PRIVATE_GROUP_ID = -1002813733555
+
+# 🚖 Kalit so‘zlar ro‘yxati (buyurtma xabarlarini aniqlash uchun)
+KEYWORDS = [
+    'taksi kerak', 'taksi bormi', 'taxi kerak', 'taxi bormi',
+    'taxsi garak', 'taksi garak', 'pochta bo', 'pochto bor',
+    'nicha som', 'nicha so'm', 'moshin bomi', 'moshin bormi','ничча сум','ничча сом','нича сом',нича сум','такси гарак','тахси гарак','
+]
+
+# 🧾 Loglar
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+
+# /start komandasi
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    await update.message.reply_text(
+        f"👋 Assalamu alaykum, {user.first_name}!\n"
+        f"Tez va ishonchli taksi topish uchun xabar yuboring."
+    )
+
+# Kalit so‘zlarni aniqlab, xabarni private guruhga yuborish
+async def keyword_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.lower()
+    if any(word in text for word in KEYWORDS):
+        msg = (
+            f"🚖 *Yangi zakaz!* \n"
+            f"👤 [{update.effective_user.full_name}](tg://user?id={update.effective_user.id})\n"
+            f"💬 {update.message.text}"
+        )
+        await context.bot.send_message(chat_id=PRIVATE_GROUP_ID, text=msg, parse_mode='Markdown')
+
+# Botni ishga tushirish
+async def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), keyword_handler))
+
+    print("✅ Bot ishga tushdi...")
+    await app.run_polling()
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+taxi-bot/
+├── main.py           ✅ Bu siz hozir yozgan kod
+├── requirements.txt  ✅ Python kutubxonalar ro‘yxati
+├── start.sh          ✅ Render.com uchun ishga tushirish skripti
+python-telegram-bot==20.8
+#!/bin/bash
+python3 main.py
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com//taxi-bot.gitBYDUEA
+git push -u origin main
